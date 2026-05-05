@@ -114,11 +114,11 @@ struct FullPlayerView: View {
                     HStack(spacing: 16) {
                         Button { showTranscript.toggle() } label: {
                             Label("Transcript", systemImage: "text.alignleft")
-                                .foregroundColor(showTranscript ? Color("AccentBlue") : .primary)
+                                .foregroundColor(showTranscript ? Color.accentTeal : .primary)
                         }
                         Button { showSnipCreator = true } label: {
                             Label("Snip", systemImage: "scissors")
-                                .foregroundColor(Color("AccentOrange"))
+                                .foregroundColor(Color.accentOrange)
                         }
                     }
                 }
@@ -137,7 +137,7 @@ struct FullPlayerView: View {
                     image.resizable().aspectRatio(contentMode: .fit)
                 } placeholder: {
                     RoundedRectangle(cornerRadius: 20)
-                        .fill(Color(.systemGray5))
+                        .fill(Color.appBackground.opacity(0.7))
                         .overlay(
                             Image(systemName: "mic.fill")
                                 .font(.system(size: 60))
@@ -164,7 +164,7 @@ struct FullPlayerView: View {
                         .lineLimit(2)
                     Text(episode.podcastTitle)
                         .font(.subheadline)
-                        .foregroundColor(Color("AccentBlue"))
+                        .foregroundColor(Color.accentTeal)
                 }
             }
             Spacer()
@@ -196,7 +196,7 @@ struct FullPlayerView: View {
                     audioPlayerManager.seekTo(time: sliderValue * audioPlayerManager.duration)
                 }
             }
-            .accentColor(Color("AccentBlue"))
+            .accentColor(Color.accentTeal)
 
             HStack {
                 Text(formatTime(audioPlayerManager.currentTime))
@@ -236,9 +236,9 @@ struct FullPlayerView: View {
             } label: {
                 ZStack {
                     Circle()
-                        .fill(Color("AccentBlue"))
+                        .fill(Color.accentTeal)
                         .frame(width: 72, height: 72)
-                        .shadow(color: Color("AccentBlue").opacity(0.4), radius: 12, x: 0, y: 6)
+                        .shadow(color: Color.accentTeal.opacity(0.4), radius: 12, x: 0, y: 6)
                     Image(systemName: audioPlayerManager.isPlaying ? "pause.fill" : "play.fill")
                         .font(.title)
                         .foregroundColor(.white)
@@ -292,7 +292,7 @@ struct FullPlayerView: View {
             } label: {
                 Image(systemName: audioPlayerManager.isSleepTimerActive ? "moon.fill" : "moon")
                     .font(.title3)
-                    .foregroundColor(audioPlayerManager.isSleepTimerActive ? Color("AccentBlue") : .primary)
+                    .foregroundColor(audioPlayerManager.isSleepTimerActive ? Color.accentTeal : .primary)
             }
             .confirmationDialog("Sleep Timer", isPresented: $showSleepTimer) {
                 Button("5 minutes") { audioPlayerManager.startSleepTimer(minutes: 5) }
@@ -325,7 +325,7 @@ struct FullPlayerView: View {
             } label: {
                 Image(systemName: "scissors")
                     .font(.title3)
-                    .foregroundColor(Color("AccentOrange"))
+                    .foregroundColor(Color.accentOrange)
             }
         }
         .padding(.horizontal, 8)
@@ -364,7 +364,7 @@ struct TranscriptInlineView: View {
                 .foregroundColor(.secondary)
         }
         .padding()
-        .background(Color(.systemGray6))
+        .background(Color.appBackground)
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }

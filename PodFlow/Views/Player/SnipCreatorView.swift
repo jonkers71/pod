@@ -60,7 +60,7 @@ struct SnipCreatorView: View {
             AsyncImage(url: URL(string: episode.podcastImageURL)) { img in
                 img.resizable().aspectRatio(contentMode: .fill)
             } placeholder: {
-                RoundedRectangle(cornerRadius: 8).fill(Color(.systemGray5))
+                RoundedRectangle(cornerRadius: 8).fill(Color.appBackground.opacity(0.7))
             }
             .frame(width: 48, height: 48)
             .clipShape(RoundedRectangle(cornerRadius: 8))
@@ -72,7 +72,7 @@ struct SnipCreatorView: View {
             Spacer()
         }
         .padding()
-        .background(Color(.systemGray6))
+        .background(Color.appBackground)
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
@@ -93,7 +93,7 @@ struct SnipCreatorView: View {
                     Text("Duration").font(.caption).foregroundColor(.secondary)
                     Text(formatTime(snipDuration))
                         .font(.title3).fontWeight(.bold)
-                        .foregroundColor(Color("AccentOrange")).monospacedDigit()
+                        .foregroundColor(Color.accentOrange).monospacedDigit()
                 }
                 Spacer()
                 VStack(alignment: .trailing, spacing: 4) {
@@ -109,7 +109,7 @@ struct SnipCreatorView: View {
                 Slider(value: $startTime, in: 0...max(audioPlayerManager.duration - 1, 1)) { _ in
                     if startTime >= endTime { endTime = min(startTime + 30, audioPlayerManager.duration) }
                 }
-                .accentColor(Color("AccentBlue"))
+                .accentColor(Color.accentTeal)
             }
 
             // End slider
@@ -118,7 +118,7 @@ struct SnipCreatorView: View {
                 Slider(value: $endTime, in: 0...max(audioPlayerManager.duration, 1)) { _ in
                     if endTime <= startTime { startTime = max(endTime - 30, 0) }
                 }
-                .accentColor(Color("AccentOrange"))
+                .accentColor(Color.accentOrange)
             }
 
             // Quick duration buttons
@@ -129,13 +129,13 @@ struct SnipCreatorView: View {
                     }
                     .font(.caption).fontWeight(.semibold)
                     .padding(.horizontal, 12).padding(.vertical, 6)
-                    .background(Color(.systemGray5))
+                    .background(Color.appBackground.opacity(0.7))
                     .clipShape(Capsule())
                 }
             }
         }
         .padding()
-        .background(Color(.systemGray6))
+        .background(Color.appBackground)
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
@@ -151,7 +151,7 @@ struct SnipCreatorView: View {
                     Label("Play Snip", systemImage: "play.fill")
                         .font(.subheadline).fontWeight(.semibold)
                         .padding(.horizontal, 20).padding(.vertical, 10)
-                        .background(Color("AccentBlue"))
+                        .background(Color.accentTeal)
                         .foregroundColor(.white)
                         .clipShape(Capsule())
                 }
@@ -161,7 +161,7 @@ struct SnipCreatorView: View {
                     Label("Jump to Start", systemImage: "arrow.left.to.line")
                         .font(.subheadline)
                         .padding(.horizontal, 16).padding(.vertical, 10)
-                        .background(Color(.systemGray5))
+                        .background(Color.appBackground.opacity(0.7))
                         .clipShape(Capsule())
                 }
             }
@@ -175,7 +175,7 @@ struct SnipCreatorView: View {
             TextField("What's interesting about this moment?", text: $note, axis: .vertical)
                 .lineLimit(3...5)
                 .padding()
-                .background(Color(.systemGray6))
+                .background(Color.appBackground)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
         }
     }
@@ -194,7 +194,7 @@ struct SnipCreatorView: View {
                 }
             }
             .frame(maxWidth: .infinity).padding()
-            .background(Color("AccentOrange"))
+            .background(Color.accentOrange)
             .clipShape(RoundedRectangle(cornerRadius: 14))
         }
         .disabled(isSaving || snipDuration < 1)

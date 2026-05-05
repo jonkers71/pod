@@ -54,7 +54,7 @@ struct PaywallView: View {
     private var heroSection: some View {
         ZStack {
             LinearGradient(
-                colors: [Color("AccentBlue"), Color("AccentPurple")],
+                colors: [Color.accentTeal, Color.accentPurple],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
@@ -94,7 +94,7 @@ struct PaywallView: View {
             }
         }
         .padding(20)
-        .background(Color(.systemGray6))
+        .background(Color.appBackground)
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
@@ -132,11 +132,11 @@ struct PaywallView: View {
             }
             .frame(maxWidth: .infinity).padding()
             .background(
-                LinearGradient(colors: [Color("AccentBlue"), Color("AccentPurple")],
+                LinearGradient(colors: [Color.accentTeal, Color.accentPurple],
                                startPoint: .leading, endPoint: .trailing)
             )
             .clipShape(RoundedRectangle(cornerRadius: 16))
-            .shadow(color: Color("AccentBlue").opacity(0.4), radius: 10, x: 0, y: 5)
+            .shadow(color: Color.accentTeal.opacity(0.4), radius: 10, x: 0, y: 5)
         }
         .disabled(subscriptionManager.isPurchasing)
     }
@@ -153,7 +153,7 @@ struct PaywallView: View {
     private var legalSection: some View {
         VStack(spacing: 8) {
             Button("Restore Purchases") { subscriptionManager.restorePurchases() }
-                .font(.caption).foregroundColor(Color("AccentBlue"))
+                .font(.caption).foregroundColor(Color.accentTeal)
             Text("Payment will be charged to your Apple ID account. Subscription automatically renews unless cancelled at least 24 hours before the end of the current period.")
                 .font(.caption2).foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
@@ -163,12 +163,12 @@ struct PaywallView: View {
     // MARK: - Data
     private var premiumFeatures: [(title: String, description: String, icon: String, color: Color)] {
         [
-            ("Ad-Free Listening", "No banner ads, ever", "nosign", Color("AccentBlue")),
-            ("Unlimited AI Transcripts", "Full searchable transcripts for every episode", "text.alignleft", Color("AccentPurple")),
-            ("Unlimited Snips", "Save as many clips as you want", "scissors", Color("AccentOrange")),
-            ("AI Episode Summaries", "Know what's in an episode before you listen", "sparkles", Color("AccentBlue")),
+            ("Ad-Free Listening", "No banner ads, ever", "nosign", Color.accentTeal),
+            ("Unlimited AI Transcripts", "Full searchable transcripts for every episode", "text.alignleft", Color.accentPurple),
+            ("Unlimited Snips", "Save as many clips as you want", "scissors", Color.accentOrange),
+            ("AI Episode Summaries", "Know what's in an episode before you listen", "sparkles", Color.accentTeal),
             ("Export to Notion & Obsidian", "Sync your insights to your favourite apps", "arrow.up.right.square", .green),
-            ("Cloud Backup & Sync", "Your library synced across all your devices", "icloud", Color("AccentBlue")),
+            ("Cloud Backup & Sync", "Your library synced across all your devices", "icloud", Color.accentTeal),
         ]
     }
 }
@@ -198,7 +198,7 @@ struct PlanOptionCard: View {
                             Text("LIMITED")
                                 .font(.caption2).fontWeight(.bold)
                                 .padding(.horizontal, 8).padding(.vertical, 3)
-                                .background(Color("AccentOrange"))
+                                .background(Color.accentOrange)
                                 .foregroundColor(.white)
                                 .clipShape(Capsule())
                         }
@@ -209,17 +209,17 @@ struct PlanOptionCard: View {
                 Spacer()
                 Text(planPrice)
                     .font(.headline).fontWeight(.bold)
-                    .foregroundColor(isSelected ? Color("AccentBlue") : .primary)
+                    .foregroundColor(isSelected ? Color.accentTeal : .primary)
 
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-                    .foregroundColor(isSelected ? Color("AccentBlue") : Color(.systemGray4))
+                    .foregroundColor(isSelected ? Color.accentTeal : Color(.systemGray4))
                     .font(.title3)
             }
             .padding(16)
-            .background(isSelected ? Color("AccentBlue").opacity(0.08) : Color(.systemGray6))
+            .background(isSelected ? Color.accentTeal.opacity(0.08) : Color.appBackground)
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(isSelected ? Color("AccentBlue") : Color.clear, lineWidth: 2)
+                    .stroke(isSelected ? Color.accentTeal : Color.clear, lineWidth: 2)
             )
             .clipShape(RoundedRectangle(cornerRadius: 12))
         }
@@ -270,7 +270,7 @@ struct AdBannerView: View {
                 .font(.caption)
         }
         .padding(10)
-        .background(Color(.systemGray6))
+        .background(Color.appBackground)
         .clipShape(RoundedRectangle(cornerRadius: 8))
         .overlay(
             RoundedRectangle(cornerRadius: 8)

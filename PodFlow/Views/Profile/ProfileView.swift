@@ -30,7 +30,7 @@ struct ProfileView: View {
                 // About
                 aboutSection
             }
-            .listStyle(.insetGrouped)
+            .listStyle(.insetGrouped).scrollContentBackground(.hidden).background(Color.appBackground)
             .navigationTitle("Profile")
             .navigationBarTitleDisplayMode(.large)
             .sheet(isPresented: $showPaywall) {
@@ -63,7 +63,7 @@ struct ProfileView: View {
                     Button("Upgrade") { showPaywall = true }
                         .font(.subheadline).fontWeight(.semibold)
                         .padding(.horizontal, 14).padding(.vertical, 7)
-                        .background(Color("AccentBlue"))
+                        .background(Color.accentTeal)
                         .foregroundColor(.white)
                         .clipShape(Capsule())
                 }
@@ -72,7 +72,7 @@ struct ProfileView: View {
 
             if subscriptionManager.currentTier == .free {
                 HStack {
-                    Image(systemName: "scissors").foregroundColor(Color("AccentOrange"))
+                    Image(systemName: "scissors").foregroundColor(Color.accentOrange)
                     Text("Snips used this month")
                     Spacer()
                     Text("\(subscriptionManager.snipsUsedThisMonth) / \(subscriptionManager.currentTier.maxSnipsPerMonth)")
@@ -87,8 +87,8 @@ struct ProfileView: View {
     private var tierColor: Color {
         switch subscriptionManager.currentTier {
         case .free: return .gray
-        case .premium: return Color("AccentBlue")
-        case .lifetime: return Color("AccentPurple")
+        case .premium: return Color.accentTeal
+        case .lifetime: return Color.accentPurple
         }
     }
 
@@ -153,12 +153,12 @@ struct ProfileView: View {
             Toggle(isOn: $userSettings.trimSilence) {
                 Label("Trim Silence", systemImage: "waveform.path.ecg")
             }
-            .tint(Color("AccentBlue"))
+            .tint(Color.accentTeal)
 
             Toggle(isOn: $userSettings.autoDownloadOnWifi) {
                 Label("Auto-Download on Wi-Fi", systemImage: "wifi")
             }
-            .tint(Color("AccentBlue"))
+            .tint(Color.accentTeal)
 
             HStack {
                 Label("Skip Forward", systemImage: "goforward")

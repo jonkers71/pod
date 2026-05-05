@@ -9,29 +9,29 @@ struct OnboardingView: View {
             icon: "waveform",
             title: "Welcome to PodFlow",
             description: "The smarter way to listen. Discover millions of podcasts, download for offline listening, and never miss an episode.",
-            accentColor: Color("AccentBlue"),
-            gradient: [Color("AccentBlue"), Color("AccentPurple")]
+            accentColor: Color.accentTeal,
+            gradient: [Color.accentTeal, Color.accentPurple]
         ),
         OnboardingPage(
             icon: "scissors",
             title: "Snip & Save Insights",
             description: "Tap the snip button to save any moment with a transcript and AI summary. Export to Notion, Obsidian, or share with friends.",
-            accentColor: Color("AccentOrange"),
-            gradient: [Color("AccentOrange"), Color.red]
+            accentColor: Color.accentOrange,
+            gradient: [Color.accentOrange, Color.red]
         ),
         OnboardingPage(
             icon: "text.alignleft",
             title: "AI-Powered Transcripts",
             description: "Read along with auto-scrolling transcripts. Search any word spoken across your entire library. Jump to any moment instantly.",
-            accentColor: Color("AccentPurple"),
-            gradient: [Color("AccentPurple"), Color("AccentBlue")]
+            accentColor: Color.accentPurple,
+            gradient: [Color.accentPurple, Color.accentTeal]
         ),
         OnboardingPage(
             icon: "arrow.down.circle.fill",
             title: "Listen Offline",
             description: "Download any episode over Wi-Fi and listen anywhere — on a plane, underground, or wherever you go.",
             accentColor: .green,
-            gradient: [.green, Color("AccentBlue")]
+            gradient: [.green, Color.accentTeal]
         ),
         OnboardingPage(
             icon: "music.note.list",

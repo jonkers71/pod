@@ -119,7 +119,7 @@ struct SearchView: View {
                 .listRowBackground(Color.clear)
             }
         }
-        .listStyle(.plain)
+        .listStyle(.plain).scrollContentBackground(.hidden).background(Color.appBackground)
     }
 
     // MARK: - Search
@@ -186,7 +186,7 @@ struct SpotifyShowRowView: View {
                 image.resizable().aspectRatio(contentMode: .fill)
             } placeholder: {
                 RoundedRectangle(cornerRadius: 8)
-                    .fill(Color(.systemGray5))
+                    .fill(Color.appBackground.opacity(0.7))
                     .overlay(Image(systemName: "music.note").foregroundColor(.gray))
             }
             .frame(width: 64, height: 64)
@@ -214,7 +214,7 @@ struct SpotifyShowRowView: View {
                 .font(.caption)
         }
         .padding(12)
-        .background(Color(.systemBackground))
+        .background(Color.appSurface)
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
     }

@@ -49,7 +49,7 @@ struct DiscoverView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {}) {
                         Image(systemName: "bell")
-                            .foregroundColor(Color("AccentBlue"))
+                            .foregroundColor(Color.accentTeal)
                     }
                 }
             }
@@ -147,7 +147,7 @@ struct DiscoverView: View {
             Text(title).font(.headline)
             Spacer()
             Button("See All") {}
-                .font(.subheadline).foregroundColor(Color("AccentBlue"))
+                .font(.subheadline).foregroundColor(Color.accentTeal)
         }.padding(.horizontal)
     }
 
@@ -172,7 +172,7 @@ struct CategoryChipView: View {
             Text(category.name).font(.subheadline).fontWeight(.medium)
         }
         .padding(.horizontal, 14).padding(.vertical, 8)
-        .background(isSelected ? category.color : Color(.systemGray6))
+        .background(isSelected ? category.color : Color.appBackground)
         .foregroundColor(isSelected ? .white : .primary)
         .clipShape(Capsule())
     }
@@ -187,7 +187,7 @@ struct PodcastCardView: View {
                 image.resizable().aspectRatio(contentMode: .fill)
             } placeholder: {
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(.systemGray5))
+                    .fill(Color.appBackground.opacity(0.7))
                     .overlay(Image(systemName: "mic.fill").foregroundColor(.gray))
             }
             .frame(width: 140, height: 140)
@@ -213,7 +213,7 @@ struct PodcastRowView: View {
                 image.resizable().aspectRatio(contentMode: .fill)
             } placeholder: {
                 RoundedRectangle(cornerRadius: 8)
-                    .fill(Color(.systemGray5))
+                    .fill(Color.appBackground.opacity(0.7))
                     .overlay(Image(systemName: "mic.fill").foregroundColor(.gray))
             }
             .frame(width: 64, height: 64)
@@ -226,8 +226,8 @@ struct PodcastRowView: View {
                     Text(cat)
                         .font(.caption2)
                         .padding(.horizontal, 8).padding(.vertical, 3)
-                        .background(Color("AccentBlue").opacity(0.15))
-                        .foregroundColor(Color("AccentBlue"))
+                        .background(Color.accentTeal.opacity(0.15))
+                        .foregroundColor(Color.accentTeal)
                         .clipShape(Capsule())
                 }
             }
@@ -235,7 +235,7 @@ struct PodcastRowView: View {
             Image(systemName: "chevron.right").foregroundColor(.secondary).font(.caption)
         }
         .padding(12)
-        .background(Color(.systemBackground))
+        .background(Color.appSurface)
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
     }
@@ -246,11 +246,11 @@ struct PodcastCardSkeleton: View {
     @State private var isAnimating = false
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            RoundedRectangle(cornerRadius: 12).fill(Color(.systemGray5))
+            RoundedRectangle(cornerRadius: 12).fill(Color.appBackground.opacity(0.7))
                 .frame(width: 140, height: 140).shimmer(isAnimating: isAnimating)
-            RoundedRectangle(cornerRadius: 4).fill(Color(.systemGray5))
+            RoundedRectangle(cornerRadius: 4).fill(Color.appBackground.opacity(0.7))
                 .frame(width: 120, height: 12).shimmer(isAnimating: isAnimating)
-            RoundedRectangle(cornerRadius: 4).fill(Color(.systemGray5))
+            RoundedRectangle(cornerRadius: 4).fill(Color.appBackground.opacity(0.7))
                 .frame(width: 80, height: 10).shimmer(isAnimating: isAnimating)
         }
         .onAppear { isAnimating = true }

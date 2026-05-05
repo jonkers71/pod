@@ -39,7 +39,7 @@ struct LibraryView: View {
                         showDownloads = true
                     } label: {
                         Image(systemName: "arrow.down.circle")
-                            .foregroundColor(Color("AccentBlue"))
+                            .foregroundColor(Color.accentTeal)
                     }
                 }
             }
@@ -90,7 +90,7 @@ struct LibraryView: View {
             Spacer(minLength: 80)
                 .listRowBackground(Color.clear)
         }
-        .listStyle(.plain)
+        .listStyle(.plain).scrollContentBackground(.hidden).background(Color.appBackground)
     }
 }
 

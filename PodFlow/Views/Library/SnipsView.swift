@@ -34,7 +34,7 @@ struct SnipsView: View {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button { showExportSheet = true } label: {
                             Image(systemName: "square.and.arrow.up")
-                                .foregroundColor(Color("AccentBlue"))
+                                .foregroundColor(Color.accentTeal)
                         }
                     }
                 }
@@ -51,7 +51,7 @@ struct SnipsView: View {
             Spacer()
             Image(systemName: "scissors")
                 .font(.system(size: 64))
-                .foregroundColor(Color("AccentOrange"))
+                .foregroundColor(Color.accentOrange)
             Text("No Snips Yet")
                 .font(.title2).fontWeight(.semibold)
             Text("While listening, tap the ✂️ button to save a clip with transcript and AI summary.")
@@ -82,12 +82,12 @@ struct SnipsView: View {
                         } label: {
                             Label("Share", systemImage: "square.and.arrow.up")
                         }
-                        .tint(Color("AccentBlue"))
+                        .tint(Color.accentTeal)
                     }
             }
             Spacer(minLength: 80).listRowBackground(Color.clear)
         }
-        .listStyle(.plain)
+        .listStyle(.plain).scrollContentBackground(.hidden).background(Color.appBackground)
     }
 
     private func shareSnip(_ snip: Snip) {
@@ -124,7 +124,7 @@ struct SnipRowView: View {
                 AsyncImage(url: URL(string: snip.podcastImageURL)) { img in
                     img.resizable().aspectRatio(contentMode: .fill)
                 } placeholder: {
-                    RoundedRectangle(cornerRadius: 6).fill(Color(.systemGray5))
+                    RoundedRectangle(cornerRadius: 6).fill(Color.appBackground.opacity(0.7))
                 }
                 .frame(width: 36, height: 36)
                 .clipShape(RoundedRectangle(cornerRadius: 6))
@@ -138,8 +138,8 @@ struct SnipRowView: View {
                 Text(formatDuration(snip.duration))
                     .font(.caption2).fontWeight(.semibold)
                     .padding(.horizontal, 8).padding(.vertical, 3)
-                    .background(Color("AccentOrange").opacity(0.15))
-                    .foregroundColor(Color("AccentOrange"))
+                    .background(Color.accentOrange.opacity(0.15))
+                    .foregroundColor(Color.accentOrange)
                     .clipShape(Capsule())
             }
 
@@ -170,7 +170,7 @@ struct SnipRowView: View {
             }
         }
         .padding(14)
-        .background(Color(.systemBackground))
+        .background(Color.appSurface)
         .clipShape(RoundedRectangle(cornerRadius: 14))
         .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
     }
@@ -215,7 +215,7 @@ struct ExportSnipsView: View {
                     Text(markdownExport)
                         .font(.system(.caption, design: .monospaced))
                         .padding()
-                        .background(Color(.systemGray6))
+                        .background(Color.appBackground)
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                         .padding(.horizontal)
 
@@ -229,7 +229,7 @@ struct ExportSnipsView: View {
                         Label("Share / Export", systemImage: "square.and.arrow.up")
                             .font(.headline).foregroundColor(.white)
                             .frame(maxWidth: .infinity).padding()
-                            .background(Color("AccentBlue"))
+                            .background(Color.accentTeal)
                             .clipShape(RoundedRectangle(cornerRadius: 14))
                             .padding(.horizontal)
                     }

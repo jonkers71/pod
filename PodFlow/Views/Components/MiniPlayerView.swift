@@ -12,10 +12,10 @@ struct MiniPlayerView: View {
                 GeometryReader { geo in
                     ZStack(alignment: .leading) {
                         Rectangle()
-                            .fill(Color(.systemGray5))
+                            .fill(Color.appBackground.opacity(0.7))
                             .frame(height: 2)
                         Rectangle()
-                            .fill(Color("AccentBlue"))
+                            .fill(Color.accentTeal)
                             .frame(width: geo.size.width * audioPlayerManager.progress, height: 2)
                     }
                 }

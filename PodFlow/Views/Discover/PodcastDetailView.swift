@@ -55,7 +55,7 @@ struct PodcastDetailView: View {
                     podcastHeader
                     subscribeButton
                         .buttonStyle(.borderedProminent)
-                        .tint(Color("AccentBlue"))
+                        .tint(Color.accentTeal)
                     descriptionSection
                     Spacer()
                 }
@@ -85,7 +85,7 @@ struct PodcastDetailView: View {
                 image.resizable().aspectRatio(contentMode: .fill)
             } placeholder: {
                 RoundedRectangle(cornerRadius: 16)
-                    .fill(Color(.systemGray5))
+                    .fill(Color.appBackground.opacity(0.7))
                     .overlay(Image(systemName: "mic.fill").font(.title).foregroundColor(.gray))
             }
             .frame(width: 110, height: 110)
@@ -97,15 +97,15 @@ struct PodcastDetailView: View {
                     .font(.title3).fontWeight(.bold)
                     .lineLimit(3)
                 Text(podcast.author)
-                    .font(.subheadline).foregroundColor(Color("AccentBlue"))
+                    .font(.subheadline).foregroundColor(Color.accentTeal)
                 if !podcast.categories.isEmpty {
                     HStack(spacing: 6) {
                         ForEach(podcast.categories.prefix(2), id: \.self) { cat in
                             Text(cat)
                                 .font(.caption2)
                                 .padding(.horizontal, 8).padding(.vertical, 3)
-                                .background(Color("AccentBlue").opacity(0.12))
-                                .foregroundColor(Color("AccentBlue"))
+                                .background(Color.accentTeal.opacity(0.12))
+                                .foregroundColor(Color.accentTeal)
                                 .clipShape(Capsule())
                         }
                     }
@@ -125,7 +125,7 @@ struct PodcastDetailView: View {
             Button(showDescription ? "Show less" : "Show more") {
                 withAnimation { showDescription.toggle() }
             }
-            .font(.caption).foregroundColor(Color("AccentBlue"))
+            .font(.caption).foregroundColor(Color.accentTeal)
         }
     }
 
@@ -147,7 +147,7 @@ struct PodcastDetailView: View {
             )
             .font(.subheadline).fontWeight(.semibold)
             .padding(.horizontal, 20).padding(.vertical, 8)
-            .background(isSubscribed ? Color(.systemGray5) : Color("AccentBlue"))
+            .background(isSubscribed ? Color.appBackground.opacity(0.7) : Color.accentTeal)
             .foregroundColor(isSubscribed ? .primary : .white)
             .clipShape(Capsule())
         }
@@ -166,7 +166,7 @@ struct PodcastDetailView: View {
                 } label: {
                     Label(sortNewestFirst ? "Newest" : "Oldest",
                           systemImage: sortNewestFirst ? "arrow.down" : "arrow.up")
-                        .font(.caption).foregroundColor(Color("AccentBlue"))
+                        .font(.caption).foregroundColor(Color.accentTeal)
                 }
                 .padding(.horizontal)
             }
@@ -224,7 +224,7 @@ struct EpisodeRowView: View {
                 } label: {
                     ZStack {
                         Circle()
-                            .fill(isCurrentlyPlaying ? Color("AccentBlue") : Color(.systemGray5))
+                            .fill(isCurrentlyPlaying ? Color.accentTeal : Color.appBackground.opacity(0.7))
                             .frame(width: 44, height: 44)
                         Image(systemName: isCurrentlyPlaying ? "pause.fill" : "play.fill")
                             .font(.system(size: 14, weight: .bold))
@@ -236,7 +236,7 @@ struct EpisodeRowView: View {
                     Text(episode.title)
                         .font(.subheadline).fontWeight(.semibold)
                         .lineLimit(2)
-                        .foregroundColor(isCurrentlyPlaying ? Color("AccentBlue") : .primary)
+                        .foregroundColor(isCurrentlyPlaying ? Color.accentTeal : .primary)
 
                     HStack(spacing: 8) {
                         Text(episode.formattedPublishDate)
@@ -251,9 +251,9 @@ struct EpisodeRowView: View {
                     if episode.playbackPosition > 0 && !episode.isPlayed {
                         GeometryReader { geo in
                             ZStack(alignment: .leading) {
-                                Capsule().fill(Color(.systemGray5)).frame(height: 3)
+                                Capsule().fill(Color.appBackground.opacity(0.7)).frame(height: 3)
                                 Capsule()
-                                    .fill(Color("AccentBlue"))
+                                    .fill(Color.accentTeal)
                                     .frame(width: geo.size.width * (episode.playbackPosition / max(episode.duration, 1)), height: 3)
                             }
                         }
@@ -278,7 +278,7 @@ struct EpisodeRowView: View {
 
             Divider().padding(.leading, 68)
         }
-        .background(Color(.systemBackground))
+        .background(Color.appSurface)
         .confirmationDialog(episode.title, isPresented: $showActions) {
             Button("Play Next") { audioPlayerManager.addToQueueNext(episode) }
             Button("Add to Queue") { audioPlayerManager.addToQueue(episode) }
@@ -306,7 +306,7 @@ struct EpisodeRowView: View {
             ZStack {
                 Circle().stroke(Color(.systemGray4), lineWidth: 2).frame(width: 24, height: 24)
                 Circle().trim(from: 0, to: progress)
-                    .stroke(Color("AccentBlue"), lineWidth: 2)
+                    .stroke(Color.accentTeal, lineWidth: 2)
                     .rotationEffect(.degrees(-90))
                     .frame(width: 24, height: 24)
                 Button { downloadManager.cancelDownload(episodeId: episode.id) } label: {
@@ -316,7 +316,7 @@ struct EpisodeRowView: View {
         case .downloaded:
             Button { downloadManager.deleteDownload(episodeId: episode.id) } label: {
                 Image(systemName: "checkmark.circle.fill")
-                    .foregroundColor(Color("AccentGreen")).font(.title3)
+                    .foregroundColor(Color.accentGreen).font(.title3)
             }
         case .failed:
             Button { downloadManager.download(episode: episode) } label: {
@@ -341,10 +341,10 @@ struct EpisodeRowSkeleton: View {
     @State private var animating = false
     var body: some View {
         HStack(spacing: 12) {
-            Circle().fill(Color(.systemGray5)).frame(width: 44, height: 44).shimmer(isAnimating: animating)
+            Circle().fill(Color.appBackground.opacity(0.7)).frame(width: 44, height: 44).shimmer(isAnimating: animating)
             VStack(alignment: .leading, spacing: 6) {
-                RoundedRectangle(cornerRadius: 4).fill(Color(.systemGray5)).frame(height: 14).shimmer(isAnimating: animating)
-                RoundedRectangle(cornerRadius: 4).fill(Color(.systemGray5)).frame(width: 120, height: 10).shimmer(isAnimating: animating)
+                RoundedRectangle(cornerRadius: 4).fill(Color.appBackground.opacity(0.7)).frame(height: 14).shimmer(isAnimating: animating)
+                RoundedRectangle(cornerRadius: 4).fill(Color.appBackground.opacity(0.7)).frame(width: 120, height: 10).shimmer(isAnimating: animating)
             }
             Spacer()
         }

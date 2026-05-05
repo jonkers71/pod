@@ -45,7 +45,7 @@ struct iPhoneRootView: View {
                     .tabItem { Label("Profile", systemImage: "person.fill") }
                     .tag(AppTab.profile)
             }
-            .accentColor(Color("AccentBlue"))
+            .accentColor(Color.accentTeal)
 
             // Floating Mini Player above tab bar
             if audioPlayerManager.currentEpisode != nil {
@@ -128,7 +128,7 @@ struct iPadSidebar: View {
                             AsyncImage(url: URL(string: podcast.imageURL)) { img in
                                 img.resizable().aspectRatio(contentMode: .fill)
                             } placeholder: {
-                                Color(.systemGray5)
+                                Color.appBackground.opacity(0.7)
                             }
                             .frame(width: 32, height: 32)
                             .clipShape(RoundedRectangle(cornerRadius: 6))

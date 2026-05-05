@@ -108,7 +108,7 @@ struct TranscriptView: View {
             Spacer()
             Image(systemName: "text.alignleft")
                 .font(.system(size: 60))
-                .foregroundColor(Color("AccentPurple"))
+                .foregroundColor(Color.accentPurple)
             Text("Transcripts are a Premium Feature")
                 .font(.title3).fontWeight(.bold)
                 .multilineTextAlignment(.center)
@@ -120,7 +120,7 @@ struct TranscriptView: View {
                 Text("Upgrade to Premium")
                     .font(.headline).foregroundColor(.white)
                     .frame(maxWidth: .infinity).padding()
-                    .background(Color("AccentBlue"))
+                    .background(Color.accentTeal)
                     .clipShape(RoundedRectangle(cornerRadius: 14))
                     .padding(.horizontal, 32)
             }
@@ -176,7 +176,7 @@ struct TranscriptSegmentRow: View {
             // Timestamp
             Text(formatTime(segment.startTime))
                 .font(.system(size: 11, design: .monospaced))
-                .foregroundColor(isActive ? Color("AccentBlue") : .secondary)
+                .foregroundColor(isActive ? Color.accentTeal : .secondary)
                 .frame(width: 44, alignment: .trailing)
                 .padding(.top, 2)
 
@@ -185,7 +185,7 @@ struct TranscriptSegmentRow: View {
                 if let speaker = segment.speaker {
                     Text(speaker)
                         .font(.caption2).fontWeight(.semibold)
-                        .foregroundColor(isActive ? Color("AccentBlue") : .secondary)
+                        .foregroundColor(isActive ? Color.accentTeal : .secondary)
                         .textCase(.uppercase)
                 }
                 Text(segment.text)
@@ -196,7 +196,7 @@ struct TranscriptSegmentRow: View {
         }
         .padding(.vertical, 6)
         .padding(.horizontal, 8)
-        .background(isActive ? Color("AccentBlue").opacity(0.08) : Color.clear)
+        .background(isActive ? Color.accentTeal.opacity(0.08) : Color.clear)
         .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 
