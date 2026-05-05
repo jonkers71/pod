@@ -1,4 +1,5 @@
 import SwiftUI
+import UserNotifications
 
 @main
 struct PodFlowApp: App {
@@ -26,6 +27,35 @@ struct PodFlowApp: App {
                 }
                 // Tint all system controls (toggles, pickers, etc.) with the logo teal
                 .tint(Color.accentTeal)
+                .onAppear {
+                    requestNotificationPermissions()
+                    setupICloudSync()
+                }
         }
+    }
+
+    private func requestNotificationPermissions() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
+            if granted {
+                print("Notification permission granted.")
+            } else if let error = error {
+                print("Notification permission error: \(error)")
+            }
+        }
+    }
+
+    private func setupICloudSync() {
+        NotificationCenter.default.addObserver(
+            forName: NSUbiquitousKeyValueStore.didChangeExternallyNotification,
+            object: NSUbiquitousKeyValueStore.default,
+            queue: .main
+        ) { _ in
+            // Handle cross-device sync here
+            let tier = NSUbiquitousKeyValueStore.default.string(forKey: "subscriptionTier")
+            if let tier = tier {
+                UserDefaults.standard.set(tier, forKey: "subscriptionTier")
+            }
+        }
+        NSUbiquitousKeyValueStore.default.synchronize()
     }
 }

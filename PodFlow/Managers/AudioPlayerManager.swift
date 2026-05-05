@@ -23,6 +23,7 @@ class AudioPlayerManager: NSObject, ObservableObject {
     private var player: AVPlayer?
     private var playerItem: AVPlayerItem?
     private var timeObserver: Any?
+    private var tap: MTAudioProcessingTap?
     private var cancellables = Set<AnyCancellable>()
     private var sleepTimer: Timer?
     private var statusObserver: NSKeyValueObservation?
@@ -139,6 +140,8 @@ class AudioPlayerManager: NSObject, ObservableObject {
             name: .AVPlayerItemDidPlayToEndTime,
             object: playerItem
         )
+
+        setupAudioTap()
 
         if autoPlay { play() }
     }
@@ -284,6 +287,44 @@ class AudioPlayerManager: NSObject, ObservableObject {
     }
 
     // MARK: - Progress
+    // MARK: - Smart Speed (Silence Trimming)
+    private func setupAudioTap() {
+        guard let playerItem = playerItem,
+              let assetTrack = playerItem.asset.tracks(withMediaType: .audio).first else { return }
+
+        var callbacks = MTAudioProcessingTapCallbacks(
+            version: kMTAudioProcessingTapCallbacksVersion_0,
+            clientInfo: UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque()),
+            init: { (tap, clientInfo, tapStorageOut) in
+                tapStorageOut.pointee = clientInfo
+            },
+            finalize: { _ in },
+            prepare: { _, _, _ in },
+            unprepare: { _ in },
+            process: { (tap, numberFrames, flags, bufferListPtr, numberFramesOut, flagsOut) in
+                let _ = MTAudioProcessingTapGetStorage(tap)
+                let status = MTAudioProcessingTapGetSourceAudio(tap, numberFrames, bufferListPtr, flagsOut, nil, numberFramesOut)
+                if status != noErr { return }
+
+                // Silence trimming logic would go here:
+                // 1. Analyze bufferListPtr for amplitude
+                // 2. If below threshold and trimSilence is true, skip or adjust playback rate
+            }
+        )
+
+        var tap: MTAudioProcessingTap?
+        let status = MTAudioProcessingTapCreate(kCFAllocatorDefault, &callbacks, kMTAudioProcessingTapCreationFlag_PostEffects, &tap)
+
+        if status == noErr, let tap = tap {
+            let inputParams = AVMutableAudioMixInputParameters(track: assetTrack)
+            inputParams.audioTapProcessor = tap
+            let audioMix = AVMutableAudioMix()
+            audioMix.inputParameters = [inputParams]
+            playerItem.audioMix = audioMix
+            self.tap = tap
+        }
+    }
+
     var progress: Double {
         guard duration > 0 else { return 0 }
         return currentTime / duration

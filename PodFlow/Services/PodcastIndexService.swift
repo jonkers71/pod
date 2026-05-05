@@ -192,10 +192,7 @@ extension Digest {
 }
 
 struct SHA1 {
-    static func hash(data: Data) -> SHA256Digest {
-        // Note: Podcast Index actually uses SHA-1 for auth
-        // Using SHA256 here as CryptoKit doesn't expose SHA1 directly
-        // In production, use CommonCrypto for true SHA1
-        return CryptoKit.SHA256.hash(data: data)
+    static func hash(data: Data) -> Insecure.SHA1Digest {
+        return Insecure.SHA1.hash(data: data)
     }
 }
