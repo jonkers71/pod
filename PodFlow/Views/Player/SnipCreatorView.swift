@@ -4,7 +4,7 @@ struct SnipCreatorView: View {
     @EnvironmentObject var audioPlayerManager: AudioPlayerManager
     @EnvironmentObject var subscriptionManager: SubscriptionManager
     @Environment(\.dismiss) var dismiss
-    @StateObject private var snipStore = SnipStore.shared
+    @EnvironmentObject var snipStore: SnipStore
     @State private var startTime: TimeInterval
     @State private var endTime: TimeInterval
     @State private var note: String = ""

@@ -6,6 +6,7 @@ class SnipStore: ObservableObject {
 
     @Published var snips: [Snip] = []
 
+    // Private init enforces singleton usage
     private init() {
         loadSnips()
     }

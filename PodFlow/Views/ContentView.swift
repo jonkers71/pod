@@ -46,19 +46,35 @@ struct iPhoneRootView: View {
             }
             .accentColor(Color.accentTeal)
 
+            // Mini player sits above the tab bar
+            // Uses safeAreaInsets to correctly position above home indicator
             if audioPlayerManager.currentEpisode != nil {
-                VStack(spacing: 0) {
-                    MiniPlayerView(showFullPlayer: $showFullPlayer)
-                }
-                .padding(.bottom, 49)
-                .transition(.move(edge: .bottom).combined(with: .opacity))
-                .animation(.spring(response: 0.4), value: audioPlayerManager.currentEpisode != nil)
+                MiniPlayerBar(showFullPlayer: $showFullPlayer)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .animation(.spring(response: 0.4), value: audioPlayerManager.currentEpisode != nil)
             }
         }
         .ignoresSafeArea(edges: .bottom)
         .sheet(isPresented: $showFullPlayer) {
             FullPlayerView()
         }
+    }
+}
+
+// MARK: - Mini Player Bar (correctly positioned above tab bar)
+struct MiniPlayerBar: View {
+    @Binding var showFullPlayer: Bool
+
+    var body: some View {
+        GeometryReader { geo in
+            VStack(spacing: 0) {
+                Spacer()
+                MiniPlayerView(showFullPlayer: $showFullPlayer)
+                    // Sit exactly on top of the tab bar (49pt) plus safe area bottom inset
+                    .padding(.bottom, 49 + geo.safeAreaInsets.bottom)
+            }
+        }
+        .ignoresSafeArea(edges: .bottom)
     }
 }
 
@@ -108,8 +124,6 @@ struct iPadSidebar: View {
     @EnvironmentObject var podcastService: PodcastIndexService
 
     var body: some View {
-        // Use a plain List with onTapGesture instead of List(selection:)
-        // which is unavailable on iOS for non-NavigationSplitView contexts
         List {
             Section("Menu") {
                 ForEach(AppTab.allCases) { tab in

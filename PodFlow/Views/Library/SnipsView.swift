@@ -1,11 +1,13 @@
 import SwiftUI
 
 struct SnipsView: View {
-    @StateObject private var snipStore = SnipStore.shared
+    // Use EnvironmentObject so this shares the same SnipStore instance
+    // that SnipCreatorView writes to. Previously @StateObject created a
+    // separate instance, so saved snips never appeared here.
+    @EnvironmentObject var snipStore: SnipStore
     @EnvironmentObject var audioPlayerManager: AudioPlayerManager
     @EnvironmentObject var subscriptionManager: SubscriptionManager
     @State private var searchText: String = ""
-    @State private var selectedSnip: Snip? = nil
     @State private var showExportSheet: Bool = false
 
     var filteredSnips: [Snip] {
@@ -54,10 +56,16 @@ struct SnipsView: View {
                 .foregroundColor(Color.accentOrange)
             Text("No Snips Yet")
                 .font(.title2).fontWeight(.semibold)
-            Text("While listening, tap the ✂️ button to save a clip with transcript and AI summary.")
-                .font(.subheadline).foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 40)
+            VStack(spacing: 8) {
+                Text("While listening, tap the ✂️ button on the player to save a clip.")
+                    .font(.subheadline).foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 40)
+                Text("Each snip saves the timestamp, transcript text, and an AI summary.")
+                    .font(.caption).foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 40)
+            }
             Spacer()
         }
     }
@@ -77,9 +85,7 @@ struct SnipsView: View {
                         }
                     }
                     .swipeActions(edge: .leading) {
-                        Button {
-                            shareSnip(snip)
-                        } label: {
+                        Button { shareSnip(snip) } label: {
                             Label("Share", systemImage: "square.and.arrow.up")
                         }
                         .tint(Color.accentTeal)
@@ -119,7 +125,6 @@ struct SnipRowView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            // Header
             HStack(spacing: 10) {
                 AsyncImage(url: URL(string: snip.podcastImageURL)) { img in
                     img.resizable().aspectRatio(contentMode: .fill)
@@ -134,7 +139,6 @@ struct SnipRowView: View {
                     Text(snip.episodeTitle).font(.caption2).foregroundColor(.secondary).lineLimit(1)
                 }
                 Spacer()
-                // Duration badge
                 Text(formatDuration(snip.duration))
                     .font(.caption2).fontWeight(.semibold)
                     .padding(.horizontal, 8).padding(.vertical, 3)
@@ -143,7 +147,6 @@ struct SnipRowView: View {
                     .clipShape(Capsule())
             }
 
-            // Transcript text
             if !snip.text.isEmpty {
                 Text("\u{201C}\(snip.text)\u{201D}")
                     .font(.subheadline)
@@ -152,7 +155,6 @@ struct SnipRowView: View {
                     .italic()
             }
 
-            // Note
             if !snip.note.isEmpty {
                 HStack(spacing: 6) {
                     Image(systemName: "note.text").font(.caption).foregroundColor(.secondary)
@@ -160,7 +162,6 @@ struct SnipRowView: View {
                 }
             }
 
-            // Footer
             HStack {
                 Text(snip.createdAt, style: .relative)
                     .font(.caption2).foregroundColor(.secondary)
@@ -209,7 +210,7 @@ struct ExportSnipsView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("Export \(snips.count) snips as Markdown")
+                    Text("Export \(snips.count) snip\(snips.count == 1 ? "" : "s") as Markdown")
                         .font(.headline).padding(.horizontal)
 
                     Text(markdownExport)
