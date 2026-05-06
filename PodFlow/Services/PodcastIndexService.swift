@@ -163,7 +163,7 @@ class PodcastIndexService: ObservableObject {
             description: feed.description ?? "",
             imageURL: feed.artwork ?? feed.image ?? "",
             feedURL: feed.url,
-            categories: Array(feed.categories?.values ?? [].makeIterator()),
+            categories: feed.categories.map { Array($0.values) } ?? [],
             episodeCount: feed.episodeCount ?? 0
         )
     }

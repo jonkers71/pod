@@ -30,7 +30,7 @@ class SubscriptionManager: ObservableObject {
         // Listen for transactions that happen outside the app
         // (renewals, family sharing, Ask to Buy approvals, etc.)
         updates = Task.detached { [weak self] in
-            for await result in Transaction.updates {
+            for await result in StoreKit.Transaction.updates {
                 await self?.handle(transaction: result)
             }
         }
@@ -58,13 +58,13 @@ class SubscriptionManager: ObservableObject {
     // MARK: - Restore / Verify Existing Entitlements
     @MainActor
     func updateSubscriptionStatus() async {
-        for await result in Transaction.currentEntitlements {
+        for await result in StoreKit.Transaction.currentEntitlements {
             await handle(transaction: result)
         }
     }
 
     // MARK: - Transaction Handler
-    private func handle(transaction result: VerificationResult<Transaction>) async {
+    private func handle(transaction result: VerificationResult<StoreKit.Transaction>) async {
         switch result {
         case .verified(let transaction):
             await MainActor.run {
