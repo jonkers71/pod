@@ -248,7 +248,8 @@ struct SpotifyConnectButton: View {
             // Trigger OAuth — needs a UIWindowScene for presentation context
             if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                let root = scene.windows.first?.rootViewController {
-                spotifyService.authenticate(presentationContext: root as! ASWebAuthenticationPresentationContextProviding)
+                let context = SpotifyPresentationContext(viewController: root)
+                spotifyService.authenticate(presentationContext: context)
             }
         } label: {
             HStack(spacing: 12) {

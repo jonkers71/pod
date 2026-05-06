@@ -62,24 +62,23 @@ struct HapticFeedback {
 }
 
 // MARK: - Semantic Colour Tokens
-// All colours reference asset catalog names directly — no circular references
 extension Color {
     /// Main screen background — Cool Slate #D1D1DB (light) / True Black #000000 (dark)
     static let appBackground    = Color("AppBackground")
-    /// Card / surface background — Near-white (light) / Dark Grey (dark)
+    /// Card / surface background
     static let appSurface       = Color("AppSurface")
-    /// Primary text — adapts automatically
+    /// Primary text
     static let appPrimaryText   = Color("AppPrimaryText")
-    /// Secondary / caption text — adapts automatically
+    /// Secondary / caption text
     static let appSecondaryText = Color("AppSecondaryText")
 
     // Logo accent colours — all reference asset catalog directly
-    static let accentTeal   = Color("AccentBlue")    // #20A0B0 — primary CTA
-    static let accentOrange = Color("AccentOrange")  // #FF9500 — snip / secondary
-    static let accentPurple = Color("AccentPurple")  // #AF52DE — premium
-    static let accentGreen  = Color("AccentGreen")   // #34C759 — success / Spotify
-    static let accentRed    = Color("AccentRed")     // #FF3B30 — danger / delete
-    static let accentPink   = Color("AccentPink")    // #E91E8C — highlights
+    static let accentTeal   = Color("AccentBlue")    // #20A0B0
+    static let accentOrange = Color("AccentOrange")  // #FF9500
+    static let accentPurple = Color("AccentPurple")  // #AF52DE
+    static let accentGreen  = Color("AccentGreen")   // #34C759
+    static let accentRed    = Color("AccentRed")     // #FF3B30
+    static let accentPink   = Color("AccentPink")    // #E91E8C
 }
 
 // MARK: - TimeInterval Formatting
@@ -94,9 +93,17 @@ extension TimeInterval {
     }
 }
 
-// MARK: - UIViewController + ASWebAuthenticationPresentationContextProviding
-extension UIViewController: ASWebAuthenticationPresentationContextProviding {
-    public func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
-        return self.view.window ?? ASPresentationAnchor()
+// MARK: - Spotify Auth Presentation Context
+// A dedicated wrapper class avoids extending UIViewController with an imported protocol
+// which would cause a compiler warning about future conformance conflicts.
+final class SpotifyPresentationContext: NSObject, ASWebAuthenticationPresentationContextProviding {
+    weak var viewController: UIViewController?
+
+    init(viewController: UIViewController?) {
+        self.viewController = viewController
+    }
+
+    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+        return viewController?.view.window ?? UIWindow()
     }
 }
