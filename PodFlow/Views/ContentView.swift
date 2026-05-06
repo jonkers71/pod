@@ -6,7 +6,6 @@ struct ContentView: View {
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
 
     var body: some View {
-        // Adaptive layout: iPad uses sidebar, iPhone uses tab bar
         if horizontalSizeClass == .regular {
             iPadRootView()
         } else {
@@ -47,7 +46,6 @@ struct iPhoneRootView: View {
             }
             .accentColor(Color.accentTeal)
 
-            // Floating Mini Player above tab bar
             if audioPlayerManager.currentEpisode != nil {
                 VStack(spacing: 0) {
                     MiniPlayerView(showFullPlayer: $showFullPlayer)
@@ -64,7 +62,7 @@ struct iPhoneRootView: View {
     }
 }
 
-// MARK: - iPad Root (NavigationSplitView Sidebar)
+// MARK: - iPad Root (NavigationSplitView)
 struct iPadRootView: View {
     @EnvironmentObject var audioPlayerManager: AudioPlayerManager
     @State private var selectedTab: AppTab = .discover
@@ -73,10 +71,8 @@ struct iPadRootView: View {
 
     var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility) {
-            // Sidebar
             iPadSidebar(selectedTab: $selectedTab)
         } detail: {
-            // Main Content
             ZStack(alignment: .bottomTrailing) {
                 Group {
                     switch selectedTab {
@@ -88,7 +84,6 @@ struct iPadRootView: View {
                     }
                 }
 
-                // Floating mini player in bottom-right corner on iPad
                 if audioPlayerManager.currentEpisode != nil {
                     MiniPlayerView(showFullPlayer: $showFullPlayer)
                         .frame(maxWidth: 400)
@@ -113,11 +108,21 @@ struct iPadSidebar: View {
     @EnvironmentObject var podcastService: PodcastIndexService
 
     var body: some View {
-        List(selection: $selectedTab) {
+        // Use a plain List with onTapGesture instead of List(selection:)
+        // which is unavailable on iOS for non-NavigationSplitView contexts
+        List {
             Section("Menu") {
                 ForEach(AppTab.allCases) { tab in
                     Label(tab.title, systemImage: tab.icon)
-                        .tag(tab)
+                        .foregroundColor(selectedTab == tab ? Color.accentTeal : .primary)
+                        .fontWeight(selectedTab == tab ? .semibold : .regular)
+                        .contentShape(Rectangle())
+                        .onTapGesture { selectedTab = tab }
+                        .listRowBackground(
+                            selectedTab == tab
+                                ? Color.accentTeal.opacity(0.12)
+                                : Color.clear
+                        )
                 }
             }
 

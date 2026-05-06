@@ -123,6 +123,7 @@ struct SearchView: View {
     }
 
     // MARK: - Search
+    @MainActor
     private func performSearch(query: String) async {
         guard !query.trimmingCharacters(in: .whitespaces).isEmpty else {
             searchResults = []
@@ -132,23 +133,21 @@ struct SearchView: View {
 
         isSearching = true
 
-        async let podcastSearch: [Podcast] = {
-            if selectedSource == .all || selectedSource == .podcasts {
-                return (try? await podcastService.searchPodcasts(query: query)) ?? Podcast.mockPodcasts.filter {
-                    $0.title.localizedCaseInsensitiveContains(query)
-                }
-            }
-            return []
-        }()
+        // Capture values on main actor before entering concurrent work
+        let source = selectedSource
+        let isSpotifyAuth = spotifyService.isAuthenticated
 
-        async let spotifySearch: [SpotifyShow] = {
-            if (selectedSource == .all || selectedSource == .spotify) && spotifyService.isAuthenticated {
-                return (try? await spotifyService.searchShows(query: query)) ?? []
-            }
-            return []
-        }()
+        var podcasts: [Podcast] = []
+        var shows: [SpotifyShow] = []
 
-        let (podcasts, shows) = await (podcastSearch, spotifySearch)
+        if source == .all || source == .podcasts {
+            podcasts = (try? await podcastService.searchPodcasts(query: query))
+                ?? Podcast.mockPodcasts.filter { $0.title.localizedCaseInsensitiveContains(query) }
+        }
+
+        if (source == .all || source == .spotify) && isSpotifyAuth {
+            shows = (try? await spotifyService.searchShows(query: query)) ?? []
+        }
 
         searchResults = podcasts
         spotifyResults = shows

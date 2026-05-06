@@ -312,8 +312,13 @@ class AudioPlayerManager: NSObject, ObservableObject {
                     inputParams.audioTapProcessor = tap
                     let mix = AVMutableAudioMix()
                     mix.inputParameters = [inputParams]
-                    await MainActor.run { playerItem.audioMix = mix }
-                    self.tap = tap
+                    // Assign on main actor; capture mix as local constant to avoid Sendable warning
+                    let finalMix = mix
+                    let finalTap = tap
+                    await MainActor.run { [weak self] in
+                        playerItem.audioMix = finalMix
+                        self?.tap = finalTap
+                    }
                 }
             } catch {
                 print("AudioTap setup error: \(error)")
