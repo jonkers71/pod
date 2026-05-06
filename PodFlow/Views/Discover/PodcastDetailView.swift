@@ -355,18 +355,27 @@ struct EpisodeRowSkeleton: View {
 // MARK: - Mock Episodes
 extension Episode {
     static func mockEpisodes(for podcast: Podcast) -> [Episode] {
-        (1...10).map { i in
-            Episode(
-                id: "\(podcast.id)_ep\(i)",
+        var result: [Episode] = []
+        for i in 1...10 {
+            let episodeId = "\(podcast.id)_ep\(i)"
+            let title = "Episode \(i): A Deep Dive into Topic \(i)"
+            let audioURL = "https://example.com/episode\(i).mp3"
+            let duration = TimeInterval(1800 + i * 300)
+            let offset = TimeInterval(-i * 86400 * 3)
+            let publishDate = Date().addingTimeInterval(offset)
+            let episode = Episode(
+                id: episodeId,
                 podcastId: podcast.id,
                 podcastTitle: podcast.title,
                 podcastImageURL: podcast.imageURL,
-                title: "Episode \(i): A Deep Dive into Topic \(i)",
+                title: title,
                 description: "In this episode we explore fascinating ideas and discuss the latest developments.",
-                audioURL: "https://example.com/episode\(i).mp3",
-                duration: TimeInterval(1800 + i * 300),
-                publishDate: Date().addingTimeInterval(TimeInterval(-i * 86400 * 3))
+                audioURL: audioURL,
+                duration: duration,
+                publishDate: publishDate
             )
+            result.append(episode)
         }
+        return result
     }
 }

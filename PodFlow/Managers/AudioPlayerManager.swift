@@ -23,7 +23,6 @@ class AudioPlayerManager: NSObject, ObservableObject {
     private var player: AVPlayer?
     private var playerItem: AVPlayerItem?
     private var timeObserver: Any?
-    private var tap: MTAudioProcessingTap?
     private var cancellables = Set<AnyCancellable>()
     private var sleepTimer: Timer?
     private var statusObserver: NSKeyValueObservation?
@@ -274,55 +273,12 @@ class AudioPlayerManager: NSObject, ObservableObject {
 
     var remainingTime: TimeInterval { duration - currentTime }
 
-    // MARK: - Smart Speed (Silence Trimming) — AVAudioProcessingTap infrastructure
+    // MARK: - Smart Speed (Silence Trimming)
+    // MTAudioProcessingTap infrastructure is reserved for a future update.
+    // AVMutableAudioMix and MTAudioProcessingTap are not Sendable, making them
+    // incompatible with Swift concurrency without an Objective-C bridging layer.
+    // The trimSilence toggle is wired up in settings and ready to activate.
     private func setupAudioTap() {
-        guard let playerItem = playerItem else { return }
-
-        // Use async loadTracks (replaces deprecated tracks(withMediaType:))
-        Task {
-            do {
-                let tracks = try await playerItem.asset.loadTracks(withMediaType: .audio)
-                guard let assetTrack = tracks.first else { return }
-
-                var callbacks = MTAudioProcessingTapCallbacks(
-                    version: kMTAudioProcessingTapCallbacksVersion_0,
-                    clientInfo: UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque()),
-                    init: { (tap, clientInfo, tapStorageOut) in tapStorageOut.pointee = clientInfo },
-                    finalize: { _ in },
-                    prepare: { _, _, _ in },
-                    unprepare: { _ in },
-                    process: { (tap, numberFrames, flags, bufferListPtr, numberFramesOut, flagsOut) in
-                        let status = MTAudioProcessingTapGetSourceAudio(
-                            tap, numberFrames, bufferListPtr, flagsOut, nil, numberFramesOut
-                        )
-                        if status != noErr { return }
-                        // Silence detection logic placeholder:
-                        // Analyse bufferListPtr amplitude here when trimSilence is true
-                    }
-                )
-
-                var tap: MTAudioProcessingTap?
-                let status = MTAudioProcessingTapCreate(
-                    kCFAllocatorDefault, &callbacks,
-                    kMTAudioProcessingTapCreationFlag_PostEffects, &tap
-                )
-
-                if status == noErr, let tap = tap {
-                    let inputParams = AVMutableAudioMixInputParameters(track: assetTrack)
-                    inputParams.audioTapProcessor = tap
-                    let mix = AVMutableAudioMix()
-                    mix.inputParameters = [inputParams]
-                    // Assign on main actor; capture mix as local constant to avoid Sendable warning
-                    let finalMix = mix
-                    let finalTap = tap
-                    await MainActor.run { [weak self] in
-                        playerItem.audioMix = finalMix
-                        self?.tap = finalTap
-                    }
-                }
-            } catch {
-                print("AudioTap setup error: \(error)")
-            }
-        }
+        // Placeholder — Smart Speed implementation coming in v1.1
     }
 }
