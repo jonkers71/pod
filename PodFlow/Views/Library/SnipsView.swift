@@ -145,7 +145,7 @@ struct SnipRowView: View {
 
             // Transcript text
             if !snip.text.isEmpty {
-                Text(""\(snip.text)"")
+                Text("\u{201C}\(snip.text)\u{201D}")
                     .font(.subheadline)
                     .foregroundColor(.primary)
                     .lineLimit(3)
