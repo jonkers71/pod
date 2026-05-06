@@ -62,22 +62,22 @@ struct HapticFeedback {
 }
 
 // MARK: - Semantic Colour Tokens
-// These automatically switch between light (Cool Slate) and dark (True Black) modes
+// All colours reference asset catalog names directly — no circular references
 extension Color {
     /// Main screen background — Cool Slate #D1D1DB (light) / True Black #000000 (dark)
     static let appBackground    = Color("AppBackground")
-    /// Card / surface background — Near-white #F5F5F9 (light) / Dark Grey #1C1C1E (dark)
+    /// Card / surface background — Near-white (light) / Dark Grey (dark)
     static let appSurface       = Color("AppSurface")
-    /// Primary text colour — adapts automatically
+    /// Primary text — adapts automatically
     static let appPrimaryText   = Color("AppPrimaryText")
     /// Secondary / caption text — adapts automatically
     static let appSecondaryText = Color("AppSecondaryText")
 
-    // Logo accent colours
-    static let accentTeal   = Color.accentTeal    // #20A0B0 — primary CTA
-    static let accentOrange = Color.accentOrange  // #FF9500 — snip / secondary
-    static let accentPurple = Color.accentPurple  // #AF52DE — premium
-    static let accentGreen  = Color.accentGreen   // #34C759 — success / Spotify
+    // Logo accent colours — all reference asset catalog directly
+    static let accentTeal   = Color("AccentBlue")    // #20A0B0 — primary CTA
+    static let accentOrange = Color("AccentOrange")  // #FF9500 — snip / secondary
+    static let accentPurple = Color("AccentPurple")  // #AF52DE — premium
+    static let accentGreen  = Color("AccentGreen")   // #34C759 — success / Spotify
     static let accentRed    = Color("AccentRed")     // #FF3B30 — danger / delete
     static let accentPink   = Color("AccentPink")    // #E91E8C — highlights
 }
