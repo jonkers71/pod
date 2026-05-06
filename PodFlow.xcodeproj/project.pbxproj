@@ -16,6 +16,7 @@
 		A1000007 /* PodcastIndexService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000007 /* PodcastIndexService.swift */; };
 		A1000008 /* SpotifyAuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000008 /* SpotifyAuthService.swift */; };
 		A1000009 /* AIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000009 /* AIService.swift */; };
+		A1000026 /* SupabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000026 /* SupabaseService.swift */; };
 		A1000010 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000010 /* ContentView.swift */; };
 		A1000011 /* DiscoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000011 /* DiscoverView.swift */; };
 		A1000012 /* PodcastDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000012 /* PodcastDetailView.swift */; };
@@ -44,6 +45,7 @@
 		A2000007 /* PodcastIndexService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastIndexService.swift; sourceTree = "<group>"; };
 		A2000008 /* SpotifyAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotifyAuthService.swift; sourceTree = "<group>"; };
 		A2000009 /* AIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIService.swift; sourceTree = "<group>"; };
+		A2000026 /* SupabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseService.swift; sourceTree = "<group>"; };
 		A2000010 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A2000011 /* DiscoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoverView.swift; sourceTree = "<group>"; };
 		A2000012 /* PodcastDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastDetailView.swift; sourceTree = "<group>"; };
@@ -107,7 +109,7 @@
 		};
 		A5000005 /* Services */ = {
 			isa = PBXGroup;
-			children = (A2000007, A2000008, A2000009);
+			children = (A2000007, A2000008, A2000009, A2000026);
 			path = Services;
 			sourceTree = "<group>";
 		};
@@ -255,7 +257,7 @@
 				A1000006, A1000007, A1000008, A1000009, A1000010,
 				A1000011, A1000012, A1000013, A1000014, A1000015,
 				A1000016, A1000017, A1000018, A1000019, A1000020,
-				A1000021, A1000022, A1000023, A1000025,
+				A1000021, A1000022, A1000023, A1000025, A1000026,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
