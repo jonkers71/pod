@@ -144,8 +144,8 @@ struct FullPlayerView: View {
                                 .foregroundColor(.gray)
                         )
                 }
-                .clipShape(RoundedRectangle(cornerRadius: 20))
-                .shadow(color: .black.opacity(0.25), radius: 20, x: 0, y: 10)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .shadow(color: Color.accentTeal.opacity(0.3), radius: 24, x: 0, y: 12)
                 .scaleEffect(audioPlayerManager.isPlaying ? 1.0 : 0.92)
                 .animation(.spring(response: 0.4), value: audioPlayerManager.isPlaying)
             }

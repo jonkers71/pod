@@ -171,9 +171,7 @@ struct SnipRowView: View {
             }
         }
         .padding(14)
-        .background(Color.appSurface)
-        .clipShape(RoundedRectangle(cornerRadius: 14))
-        .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
+        .glassCard(cornerRadius: 14)
     }
 
     private func formatTime(_ t: TimeInterval) -> String {

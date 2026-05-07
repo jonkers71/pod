@@ -40,6 +40,26 @@ extension View {
     }
 }
 
+// MARK: - Glass Card Modifier
+// Applies a frosted glass surface — uses ultraThinMaterial on iOS 17+
+// and automatically benefits from Liquid Glass rendering on iOS 26+
+struct GlassCardModifier: ViewModifier {
+    var cornerRadius: CGFloat = 14
+
+    func body(content: Content) -> some View {
+        content
+            .background(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+            .shadow(color: .black.opacity(0.06), radius: 6, x: 0, y: 2)
+    }
+}
+
+extension View {
+    func glassCard(cornerRadius: CGFloat = 14) -> some View {
+        modifier(GlassCardModifier(cornerRadius: cornerRadius))
+    }
+}
+
 // MARK: - Conditional Modifier
 extension View {
     @ViewBuilder
@@ -94,8 +114,6 @@ extension TimeInterval {
 }
 
 // MARK: - Spotify Auth Presentation Context
-// A dedicated wrapper class avoids extending UIViewController with an imported protocol
-// which would cause a compiler warning about future conformance conflicts.
 final class SpotifyPresentationContext: NSObject, ASWebAuthenticationPresentationContextProviding {
     weak var viewController: UIViewController?
 

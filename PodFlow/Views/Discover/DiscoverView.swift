@@ -235,9 +235,7 @@ struct PodcastRowView: View {
             Image(systemName: "chevron.right").foregroundColor(.secondary).font(.caption)
         }
         .padding(12)
-        .background(Color.appSurface)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-        .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
+        .glassCard(cornerRadius: 12)
     }
 }
 
