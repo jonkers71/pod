@@ -18,8 +18,8 @@ class SupabaseService: ObservableObject {
     static let shared = SupabaseService()
 
     // Replace these with your Supabase project values
-    private let supabaseURL = "YOUR_SUPABASE_URL"
-    private let supabaseKey = "YOUR_SUPABASE_ANON_KEY"
+    private let supabaseURL = "https://mnxqwckssziljmraudax.supabase.co"
+    private let supabaseKey = "sb_publishable_xvZB-p_WBQnTgOunrxUKaA_T_5R9Tv5"
 
     @Published var isAuthenticated: Bool = false
     @Published var currentUserId: String? = nil
