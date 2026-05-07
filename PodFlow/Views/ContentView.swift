@@ -21,60 +21,44 @@ struct iPhoneRootView: View {
     @State private var selectedTab: AppTab = .discover
     @State private var showFullPlayer: Bool = false
 
+    // Mini player height — used to push tab content up
+    private let miniPlayerHeight: CGFloat = 64
+
     var body: some View {
-        ZStack(alignment: .bottom) {
-            TabView(selection: $selectedTab) {
-                DiscoverView()
-                    .tabItem { Label("Discover", systemImage: "house.fill") }
-                    .tag(AppTab.discover)
+        TabView(selection: $selectedTab) {
+            DiscoverView()
+                .tabItem { Label("Discover", systemImage: "house.fill") }
+                .tag(AppTab.discover)
 
-                SearchView()
-                    .tabItem { Label("Search", systemImage: "magnifyingglass") }
-                    .tag(AppTab.search)
+            SearchView()
+                .tabItem { Label("Search", systemImage: "magnifyingglass") }
+                .tag(AppTab.search)
 
-                LibraryView()
-                    .tabItem { Label("Library", systemImage: "books.vertical.fill") }
-                    .tag(AppTab.library)
+            LibraryView()
+                .tabItem { Label("Library", systemImage: "books.vertical.fill") }
+                .tag(AppTab.library)
 
-                SnipsView()
-                    .tabItem { Label("Snips", systemImage: "scissors") }
-                    .tag(AppTab.snips)
+            SnipsView()
+                .tabItem { Label("Snips", systemImage: "scissors") }
+                .tag(AppTab.snips)
 
-                ProfileView()
-                    .tabItem { Label("Profile", systemImage: "person.fill") }
-                    .tag(AppTab.profile)
-            }
-            .accentColor(Color.accentTeal)
-
-            // Mini player sits above the tab bar
-            // Uses safeAreaInsets to correctly position above home indicator
+            ProfileView()
+                .tabItem { Label("Profile", systemImage: "person.fill") }
+                .tag(AppTab.profile)
+        }
+        .accentColor(Color.accentTeal)
+        // safeAreaInset pushes ALL tab content up by the mini player height
+        // when a player is active — the tab bar itself stays in place
+        .safeAreaInset(edge: .bottom, spacing: 0) {
             if audioPlayerManager.currentEpisode != nil {
-                MiniPlayerBar(showFullPlayer: $showFullPlayer)
+                MiniPlayerView(showFullPlayer: $showFullPlayer)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                     .animation(.spring(response: 0.4), value: audioPlayerManager.currentEpisode != nil)
             }
         }
-        .ignoresSafeArea(edges: .bottom)
         .sheet(isPresented: $showFullPlayer) {
             FullPlayerView()
         }
-    }
-}
-
-// MARK: - Mini Player Bar (correctly positioned above tab bar)
-struct MiniPlayerBar: View {
-    @Binding var showFullPlayer: Bool
-
-    var body: some View {
-        GeometryReader { geo in
-            VStack(spacing: 0) {
-                Spacer()
-                MiniPlayerView(showFullPlayer: $showFullPlayer)
-                    // Sit exactly on top of the tab bar (49pt) plus safe area bottom inset
-                    .padding(.bottom, 49 + geo.safeAreaInsets.bottom)
-            }
-        }
-        .ignoresSafeArea(edges: .bottom)
     }
 }
 
@@ -89,23 +73,26 @@ struct iPadRootView: View {
         NavigationSplitView(columnVisibility: $columnVisibility) {
             iPadSidebar(selectedTab: $selectedTab)
         } detail: {
-            ZStack(alignment: .bottomTrailing) {
-                Group {
-                    switch selectedTab {
-                    case .discover: DiscoverView()
-                    case .search:   SearchView()
-                    case .library:  LibraryView()
-                    case .snips:    SnipsView()
-                    case .profile:  ProfileView()
-                    }
+            Group {
+                switch selectedTab {
+                case .discover: DiscoverView()
+                case .search:   SearchView()
+                case .library:  LibraryView()
+                case .snips:    SnipsView()
+                case .profile:  ProfileView()
                 }
-
+            }
+            .safeAreaInset(edge: .bottom, spacing: 0) {
                 if audioPlayerManager.currentEpisode != nil {
-                    MiniPlayerView(showFullPlayer: $showFullPlayer)
-                        .frame(maxWidth: 400)
-                        .padding()
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
-                        .animation(.spring(response: 0.4), value: audioPlayerManager.currentEpisode != nil)
+                    HStack {
+                        Spacer()
+                        MiniPlayerView(showFullPlayer: $showFullPlayer)
+                            .frame(maxWidth: 420)
+                        Spacer()
+                    }
+                    .padding(.horizontal)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .animation(.spring(response: 0.4), value: audioPlayerManager.currentEpisode != nil)
                 }
             }
         }

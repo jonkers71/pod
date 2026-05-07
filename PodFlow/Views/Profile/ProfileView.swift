@@ -6,12 +6,21 @@ struct ProfileView: View {
     @EnvironmentObject var subscriptionManager: SubscriptionManager
     @EnvironmentObject var spotifyService: SpotifyAuthService
     @EnvironmentObject var downloadManager: DownloadManager
+    @StateObject private var supabase = SupabaseService.shared
     @State private var showPaywall: Bool = false
     @State private var showAppearancePicker: Bool = false
+    @State private var showSignIn: Bool = false
+    @State private var email: String = ""
+    @State private var password: String = ""
+    @State private var isSigningIn: Bool = false
+    @State private var signInError: String? = nil
 
     var body: some View {
         NavigationStack {
             List {
+                // Account / Supabase
+                accountSection
+
                 // Subscription Banner
                 subscriptionSection
 
@@ -37,6 +46,109 @@ struct ProfileView: View {
                 PaywallView()
             }
         }
+    }
+
+    // MARK: - Account (Supabase)
+    private var accountSection: some View {
+        Section("Account") {
+            if supabase.isAuthenticated {
+                HStack(spacing: 12) {
+                    ZStack {
+                        Circle().fill(Color.accentTeal.opacity(0.15)).frame(width: 44, height: 44)
+                        Image(systemName: "person.fill").foregroundColor(Color.accentTeal)
+                    }
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(supabase.userEmail ?? "Signed In")
+                            .font(.subheadline).fontWeight(.medium)
+                        Text("Library & snips syncing across devices")
+                            .font(.caption).foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    Image(systemName: "checkmark.circle.fill").foregroundColor(.green)
+                }
+                Button(role: .destructive) {
+                    Task { await supabase.signOut() }
+                } label: {
+                    Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
+                        .foregroundColor(.red)
+                }
+            } else {
+                // Sign In Form
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Sign in to sync your library, snips, and playback position across all your devices.")
+                        .font(.caption).foregroundColor(.secondary)
+
+                    TextField("Email", text: $email)
+                        .keyboardType(.emailAddress)
+                        .autocapitalization(.none)
+                        .textContentType(.emailAddress)
+                        .padding(10)
+                        .background(Color.appBackground)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                    SecureField("Password", text: $password)
+                        .textContentType(.password)
+                        .padding(10)
+                        .background(Color.appBackground)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+
+                    if let error = signInError {
+                        Text(error).font(.caption).foregroundColor(.red)
+                    }
+
+                    HStack(spacing: 12) {
+                        Button {
+                            Task { await signIn() }
+                        } label: {
+                            Group {
+                                if isSigningIn {
+                                    ProgressView().tint(.white)
+                                } else {
+                                    Text("Sign In")
+                                        .font(.subheadline).fontWeight(.semibold).foregroundColor(.white)
+                                }
+                            }
+                            .frame(maxWidth: .infinity).padding(.vertical, 10)
+                            .background(Color.accentTeal)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                        }
+                        .disabled(email.isEmpty || password.isEmpty || isSigningIn)
+
+                        Button {
+                            Task { await signUp() }
+                        } label: {
+                            Text("Create Account")
+                                .font(.subheadline).fontWeight(.semibold)
+                                .foregroundColor(Color.accentTeal)
+                                .frame(maxWidth: .infinity).padding(.vertical, 10)
+                                .background(Color.accentTeal.opacity(0.12))
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                        }
+                        .disabled(email.isEmpty || password.isEmpty || isSigningIn)
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+        }
+    }
+
+    private func signIn() async {
+        isSigningIn = true
+        signInError = nil
+        // Once Supabase package is added, replace with:
+        // let session = try await supabase.client.auth.signIn(email: email, password: password)
+        // For now, show a helpful message
+        try? await Task.sleep(nanoseconds: 500_000_000)
+        signInError = "Add the Supabase Swift package in Xcode to activate sign-in. See supabase/SETUP.md"
+        isSigningIn = false
+    }
+
+    private func signUp() async {
+        isSigningIn = true
+        signInError = nil
+        try? await Task.sleep(nanoseconds: 500_000_000)
+        signInError = "Add the Supabase Swift package in Xcode to activate sign-up. See supabase/SETUP.md"
+        isSigningIn = false
     }
 
     // MARK: - Subscription
