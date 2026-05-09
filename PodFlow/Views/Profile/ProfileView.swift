@@ -141,19 +141,23 @@ struct ProfileView: View {
     private func signIn() async {
         isSigningIn = true
         signInError = nil
-        
-        // TODO: Add real Supabase sign-in logic here when ready
-        // Example: let session = try await supabase.client.auth.signIn(email: email, password: password)
-        
+        do {
+            try await supabase.signIn(email: email, password: password)
+        } catch {
+            signInError = error.localizedDescription
+        }
         isSigningIn = false
     }
 
     private func signUp() async {
         isSigningIn = true
         signInError = nil
-        
-        // TODO: Add real Supabase sign-up logic here when ready
-        
+        do {
+            try await supabase.signUp(email: email, password: password)
+            signInError = "Check your email to confirm your account, then sign in."
+        } catch {
+            signInError = error.localizedDescription
+        }
         isSigningIn = false
     }
 
@@ -272,7 +276,7 @@ struct ProfileView: View {
                 Label("Trim Silence", systemImage: "waveform.path.ecg")
             }
             .tint(Color.accentTeal)
-            .onChange(of: userSettings.trimSilence) { newValue in
+            .onChange(of: userSettings.trimSilence) { _, newValue in
                 if newValue {
                     userSettings.trimSilence = false
                     showFeatureInDevAlert = true

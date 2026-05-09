@@ -1,140 +1,207 @@
 import Foundation
+import Supabase
 import Combine
 
 // MARK: - Supabase Service
-// Handles user authentication and cloud sync for PodFlow.
-//
-// SETUP REQUIRED:
-// 1. Add the Supabase Swift package in Xcode:
-//    File → Add Package Dependencies → https://github.com/supabase/supabase-swift
-// 2. Replace the placeholder URL and key below with your values from
-//    https://app.supabase.com → Settings → API
-// 3. See supabase/SETUP.md for full instructions
-//
-// Until Supabase is configured, the app works fully offline with local storage.
-// Supabase sync is additive — it does not replace local storage, it mirrors it.
+// Full integration — requires the Supabase Swift package (already added).
+// Project: https://mnxqwckssziljmraudax.supabase.co
 
 class SupabaseService: ObservableObject {
     static let shared = SupabaseService()
 
-    // Replace these with your Supabase project values
-    private let supabaseURL = "https://mnxqwckssziljmraudax.supabase.co"
-    private let supabaseKey = "sb_publishable_xvZB-p_WBQnTgOunrxUKaA_T_5R9Tv5"
+    // Supabase client — initialised with project URL and anon key
+    let client = SupabaseClient(
+        supabaseURL: URL(string: "https://mnxqwckssziljmraudax.supabase.co")!,
+        supabaseKey: "sb_publishable_xvZB-p_WBQnTgOunrxUKaA_T_5R9Tv5"
+    )
 
     @Published var isAuthenticated: Bool = false
     @Published var currentUserId: String? = nil
     @Published var userEmail: String? = nil
     @Published var isSyncing: Bool = false
 
-    var isConfigured: Bool {
-        return supabaseURL != "YOUR_SUPABASE_URL" && supabaseKey != "YOUR_SUPABASE_ANON_KEY"
-    }
-
     private init() {
-        loadLocalSession()
+        Task { await restoreSession() }
     }
 
-    // MARK: - Auth
-
-    /// Sign in with Apple — call this from the Profile screen
-    func signInWithApple(identityToken: String, fullName: String?) async {
-        guard isConfigured else {
-            print("SupabaseService: Not configured. See supabase/SETUP.md")
-            return
+    // MARK: - Session Restore
+    private func restoreSession() async {
+        do {
+            let session = try await client.auth.session
+            await MainActor.run {
+                self.isAuthenticated = true
+                self.currentUserId = session.user.id.uuidString
+                self.userEmail = session.user.email
+            }
+        } catch {
+            // No active session — user needs to sign in
         }
-        // Full implementation requires the Supabase Swift package.
-        // Once the package is added, replace this with:
-        //
-        // let session = try await supabase.auth.signInWithIdToken(
-        //     credentials: .init(provider: .apple, idToken: identityToken)
-        // )
-        // await MainActor.run {
-        //     self.isAuthenticated = true
-        //     self.currentUserId = session.user.id.uuidString
-        //     self.userEmail = session.user.email
-        // }
-        print("SupabaseService: signInWithApple called — add Supabase package to activate")
     }
 
+    // MARK: - Sign In
+    func signIn(email: String, password: String) async throws {
+        let session = try await client.auth.signIn(email: email, password: password)
+        await MainActor.run {
+            self.isAuthenticated = true
+            self.currentUserId = session.user.id.uuidString
+            self.userEmail = session.user.email
+        }
+    }
+
+    // MARK: - Sign Up
+    func signUp(email: String, password: String) async throws {
+        let response = try await client.auth.signUp(email: email, password: password)
+        if let session = response.session {
+            await MainActor.run {
+                self.isAuthenticated = true
+                self.currentUserId = session.user.id.uuidString
+                self.userEmail = session.user.email
+            }
+        }
+        // If no session, email confirmation is required — user will see a message
+    }
+
+    // MARK: - Sign Out
     func signOut() async {
-        isAuthenticated = false
-        currentUserId = nil
-        userEmail = nil
-        UserDefaults.standard.removeObject(forKey: "supabaseUserId")
+        try? await client.auth.signOut()
+        await MainActor.run {
+            self.isAuthenticated = false
+            self.currentUserId = nil
+            self.userEmail = nil
+        }
     }
 
-    // MARK: - Sync Subscriptions
+    // MARK: - Sync Subscriptions to Cloud
     func syncSubscriptions(_ podcasts: [Podcast]) async {
-        guard isConfigured, isAuthenticated, let userId = currentUserId else { return }
-        isSyncing = true
+        guard isAuthenticated, let userId = currentUserId else { return }
+        await MainActor.run { isSyncing = true }
         defer { Task { @MainActor in self.isSyncing = false } }
 
-        // Once Supabase package is added, replace with:
-        // try await supabase
-        //     .from("podcast_subscriptions")
-        //     .upsert(podcasts.map { SupabasePodcastSubscription(from: $0, userId: userId) })
-        //     .execute()
-        print("SupabaseService: syncSubscriptions — \(podcasts.count) podcasts (add Supabase package to activate)")
+        do {
+            let rows = podcasts.map { podcast in
+                SupabasePodcastSubscription(from: podcast, userId: userId)
+            }
+            try await client
+                .from("podcast_subscriptions")
+                .upsert(rows, onConflict: "user_id,podcast_id")
+                .execute()
+        } catch {
+            print("SupabaseService: syncSubscriptions error: \(error)")
+        }
     }
 
+    // MARK: - Fetch Subscriptions from Cloud
     func fetchSubscriptions() async -> [Podcast] {
-        guard isConfigured, isAuthenticated else { return [] }
-        // Once Supabase package is added, replace with:
-        // let response = try await supabase
-        //     .from("podcast_subscriptions")
-        //     .select()
-        //     .eq("user_id", value: currentUserId!)
-        //     .execute()
-        // return response.value as [SupabasePodcastSubscription] mapped to [Podcast]
-        return []
+        guard isAuthenticated, let userId = currentUserId else { return [] }
+        do {
+            let rows: [SupabasePodcastSubscription] = try await client
+                .from("podcast_subscriptions")
+                .select()
+                .eq("user_id", value: userId)
+                .execute()
+                .value
+            return rows.map { $0.toPodcast() }
+        } catch {
+            print("SupabaseService: fetchSubscriptions error: \(error)")
+            return []
+        }
     }
 
-    // MARK: - Sync Snips
+    // MARK: - Remove Subscription from Cloud
+    func removeSubscription(podcastId: String) async {
+        guard isAuthenticated, let userId = currentUserId else { return }
+        do {
+            try await client
+                .from("podcast_subscriptions")
+                .delete()
+                .eq("user_id", value: userId)
+                .eq("podcast_id", value: podcastId)
+                .execute()
+        } catch {
+            print("SupabaseService: removeSubscription error: \(error)")
+        }
+    }
+
+    // MARK: - Sync Snip to Cloud
     func syncSnip(_ snip: Snip) async {
-        guard isConfigured, isAuthenticated, let userId = currentUserId else { return }
-        // Once Supabase package is added:
-        // try await supabase.from("snips").upsert(SupabaseSnip(from: snip, userId: userId)).execute()
-        print("SupabaseService: syncSnip '\(snip.episodeTitle)' (add Supabase package to activate)")
+        guard isAuthenticated, let userId = currentUserId else { return }
+        do {
+            let row = SupabaseSnip(from: snip, userId: userId)
+            try await client
+                .from("snips")
+                .upsert(row, onConflict: "id")
+                .execute()
+        } catch {
+            print("SupabaseService: syncSnip error: \(error)")
+        }
     }
 
+    // MARK: - Fetch Snips from Cloud
     func fetchSnips() async -> [Snip] {
-        guard isConfigured, isAuthenticated else { return [] }
-        return []
+        guard isAuthenticated, let userId = currentUserId else { return [] }
+        do {
+            let rows: [SupabaseSnip] = try await client
+                .from("snips")
+                .select()
+                .eq("user_id", value: userId)
+                .order("created_at", ascending: false)
+                .execute()
+                .value
+            return rows.map { $0.toSnip() }
+        } catch {
+            print("SupabaseService: fetchSnips error: \(error)")
+            return []
+        }
     }
 
     // MARK: - Sync Playback Position
-    func syncPlaybackPosition(episodeId: String, podcastId: String, position: TimeInterval, duration: TimeInterval) async {
-        guard isConfigured, isAuthenticated, let userId = currentUserId else { return }
-        // Once Supabase package is added:
-        // try await supabase.from("playback_positions")
-        //     .upsert(["user_id": userId, "episode_id": episodeId, "position": position, ...])
-        //     .execute()
-        _ = userId // suppress unused warning
+    func syncPlaybackPosition(episodeId: String, podcastId: String,
+                               position: TimeInterval, duration: TimeInterval) async {
+        guard isAuthenticated, let userId = currentUserId else { return }
+        do {
+            let row: [String: AnyJSON] = [
+                "user_id": .string(userId),
+                "episode_id": .string(episodeId),
+                "podcast_id": .string(podcastId),
+                "position": .double(position),
+                "duration": .double(duration),
+                "updated_at": .string(ISO8601DateFormatter().string(from: Date()))
+            ]
+            try await client
+                .from("playback_positions")
+                .upsert(row, onConflict: "user_id,episode_id")
+                .execute()
+        } catch {
+            print("SupabaseService: syncPlaybackPosition error: \(error)")
+        }
     }
 
-    func fetchPlaybackPosition(episodeId: String) async -> TimeInterval? {
-        guard isConfigured, isAuthenticated else { return nil }
-        return nil
-    }
-
-    // MARK: - Record Listening History (for future personalisation)
-    func recordListeningEvent(episodeId: String, podcastId: String, podcastTitle: String,
-                               categories: [String], percentPlayed: Double, completed: Bool) async {
-        guard isConfigured, isAuthenticated else { return }
-        // Once Supabase package is added, insert into listening_history table
-    }
-
-    // MARK: - Local Session Persistence
-    private func loadLocalSession() {
-        if let userId = UserDefaults.standard.string(forKey: "supabaseUserId") {
-            currentUserId = userId
-            isAuthenticated = true
+    // MARK: - Record Listening Event (for future personalisation)
+    func recordListeningEvent(episodeId: String, podcastId: String,
+                               podcastTitle: String, categories: [String],
+                               percentPlayed: Double, completed: Bool) async {
+        guard isAuthenticated, let userId = currentUserId else { return }
+        do {
+            let row: [String: AnyJSON] = [
+                "user_id": .string(userId),
+                "episode_id": .string(episodeId),
+                "podcast_id": .string(podcastId),
+                "podcast_title": .string(podcastTitle),
+                "percent_played": .double(percentPlayed),
+                "was_completed": .bool(completed),
+                "listened_at": .string(ISO8601DateFormatter().string(from: Date()))
+            ]
+            try await client
+                .from("listening_history")
+                .insert(row)
+                .execute()
+        } catch {
+            print("SupabaseService: recordListeningEvent error: \(error)")
         }
     }
 }
 
 // MARK: - Supabase Data Transfer Objects
-// These will be used once the Supabase package is added
 
 struct SupabasePodcastSubscription: Codable {
     let userId: String
@@ -155,6 +222,20 @@ struct SupabasePodcastSubscription: Codable {
         self.categories = podcast.categories
     }
 
+    func toPodcast() -> Podcast {
+        Podcast(
+            id: podcastId,
+            title: podcastTitle,
+            author: podcastAuthor ?? "",
+            description: "",
+            imageURL: podcastImage ?? "",
+            feedURL: feedUrl,
+            categories: categories,
+            episodeCount: 0,
+            isSubscribed: true
+        )
+    }
+
     enum CodingKeys: String, CodingKey {
         case userId = "user_id"
         case podcastId = "podcast_id"
@@ -167,6 +248,7 @@ struct SupabasePodcastSubscription: Codable {
 }
 
 struct SupabaseSnip: Codable {
+    let id: String
     let userId: String
     let episodeId: String
     let episodeTitle: String
@@ -177,8 +259,10 @@ struct SupabaseSnip: Codable {
     let transcriptText: String?
     let summary: String?
     let note: String
+    let createdAt: String?
 
     init(from snip: Snip, userId: String) {
+        self.id = snip.id
         self.userId = userId
         self.episodeId = snip.episodeId
         self.episodeTitle = snip.episodeTitle
@@ -189,9 +273,28 @@ struct SupabaseSnip: Codable {
         self.transcriptText = snip.text.isEmpty ? nil : snip.text
         self.summary = snip.summary.isEmpty ? nil : snip.summary
         self.note = snip.note
+        self.createdAt = ISO8601DateFormatter().string(from: snip.createdAt)
+    }
+
+    func toSnip() -> Snip {
+        let date = createdAt.flatMap { ISO8601DateFormatter().date(from: $0) } ?? Date()
+        return Snip(
+            id: id,
+            episodeId: episodeId,
+            episodeTitle: episodeTitle,
+            podcastTitle: podcastTitle,
+            podcastImageURL: podcastImage ?? "",
+            startTime: startTime,
+            endTime: endTime,
+            text: transcriptText ?? "",
+            summary: summary ?? "",
+            createdAt: date,
+            note: note
+        )
     }
 
     enum CodingKeys: String, CodingKey {
+        case id
         case userId = "user_id"
         case episodeId = "episode_id"
         case episodeTitle = "episode_title"
@@ -201,5 +304,6 @@ struct SupabaseSnip: Codable {
         case endTime = "end_time"
         case transcriptText = "transcript_text"
         case summary, note
+        case createdAt = "created_at"
     }
 }
