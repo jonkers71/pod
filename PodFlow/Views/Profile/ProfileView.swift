@@ -14,6 +14,7 @@ struct ProfileView: View {
     @State private var password: String = ""
     @State private var isSigningIn: Bool = false
     @State private var signInError: String? = nil
+    @State private var showFeatureInDevAlert: Bool = false
 
     var body: some View {
         NavigationStack {
@@ -44,6 +45,11 @@ struct ProfileView: View {
             .navigationBarTitleDisplayMode(.large)
             .sheet(isPresented: $showPaywall) {
                 PaywallView()
+            }
+            .alert("Feature in Development", isPresented: $showFeatureInDevAlert) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("Smart Speed (silence trimming) will be available in version 1.1.")
             }
         }
     }
@@ -135,19 +141,19 @@ struct ProfileView: View {
     private func signIn() async {
         isSigningIn = true
         signInError = nil
-        // Once Supabase package is added, replace with:
-        // let session = try await supabase.client.auth.signIn(email: email, password: password)
-        // For now, show a helpful message
-        try? await Task.sleep(nanoseconds: 500_000_000)
-        signInError = "Add the Supabase Swift package in Xcode to activate sign-in. See supabase/SETUP.md"
+        
+        // TODO: Add real Supabase sign-in logic here when ready
+        // Example: let session = try await supabase.client.auth.signIn(email: email, password: password)
+        
         isSigningIn = false
     }
 
     private func signUp() async {
         isSigningIn = true
         signInError = nil
-        try? await Task.sleep(nanoseconds: 500_000_000)
-        signInError = "Add the Supabase Swift package in Xcode to activate sign-up. See supabase/SETUP.md"
+        
+        // TODO: Add real Supabase sign-up logic here when ready
+        
         isSigningIn = false
     }
 
@@ -266,6 +272,12 @@ struct ProfileView: View {
                 Label("Trim Silence", systemImage: "waveform.path.ecg")
             }
             .tint(Color.accentTeal)
+            .onChange(of: userSettings.trimSilence) { newValue in
+                if newValue {
+                    userSettings.trimSilence = false
+                    showFeatureInDevAlert = true
+                }
+            }
 
             Toggle(isOn: $userSettings.autoDownloadOnWifi) {
                 Label("Auto-Download on Wi-Fi", systemImage: "wifi")

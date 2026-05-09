@@ -7,7 +7,7 @@ class SpotifyAuthService: ObservableObject {
 
     // MARK: - Spotify App Credentials
     // Register your app at https://developer.spotify.com/dashboard
-    private let clientId = "YOUR_SPOTIFY_CLIENT_ID"
+    private let clientId = "daee12508f8b4f05abf09ab429ea504c"
     private let redirectURI = "podflow://spotify-callback"
     private let scopes = "user-library-read user-follow-read user-read-playback-state"
 
